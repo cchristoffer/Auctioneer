@@ -7,6 +7,7 @@ import com.example.auctioneer.Model.Item;
 import com.example.auctioneer.Observable.AuctionObserver;
 import com.example.auctioneer.Observable.AuctionPublisher;
 import com.example.auctioneer.Observable.BidObserver;
+import com.example.auctioneer.Repository.BidRepository;
 import com.example.auctioneer.Service.AuctionService;
 import com.example.auctioneer.Service.CategoryService;
 import com.example.auctioneer.Service.ItemService;
@@ -20,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -51,6 +50,9 @@ public class AuctionController {
 
     @Autowired
     AuctionObserver auctionObserver;
+
+    @Autowired
+    BidRepository bidRepository;
 
 
     @GetMapping("/{pageno}")
@@ -139,13 +141,12 @@ public class AuctionController {
             highestBid = auction.getHighestBid().getBidPrice();
             hasBid = true;
         }
-        List<Bid> bidsList = auction.getBids();
+        List<Bid> bidsList = bidRepository.findAllBidsByPrice(id);
         model.addAttribute("title", auction.getItem().getName());
         model.addAttribute("auction", auction);
         model.addAttribute("highestBid", highestBid);
         model.addAttribute("numBids", auction.getBids().size());
         model.addAttribute("hasBid", hasBid);
-        Collections.reverse(bidsList);
         model.addAttribute("bids", bidsList);
 
         return "auctionItem";
@@ -156,11 +157,10 @@ public class AuctionController {
         Auction auction = auctionService.findAuctionById(id);
         boolean hasBid = false;
         Double highestBid = auction.getStartingPrice();
-        List<Bid> bidsList = new ArrayList<>();
+        List<Bid> bidsList = bidRepository.findAllBidsByPrice(id);
         if(auction.getHighestBid()!=null) {
             highestBid = auction.getHighestBid().getBidPrice();
             hasBid = true;
-            bidsList = auction.getBids();
         }
         if(auctionService.findAuctionById(id).getHighestBid() != null){
             if(bid <= auctionService.findAuctionById(id).getHighestBid().getBidPrice()){
@@ -169,7 +169,6 @@ public class AuctionController {
                 model.addAttribute("highestBid", highestBid);
                 model.addAttribute("numBids", auction.getBids().size());
                 model.addAttribute("hasBid", hasBid);
-                Collections.reverse(bidsList);
                 model.addAttribute("bids", bidsList);
                 model.addAttribute("msg", "Unsuccessful, please enter a bid above currently highest bid.");
                 model.addAttribute("class", "text-danger");
@@ -190,7 +189,6 @@ public class AuctionController {
         model.addAttribute("hasBid", hasBid);
         model.addAttribute("title", auction.getItem().getName());
         model.addAttribute("auction", auction);
-        Collections.reverse(bidsList);
         model.addAttribute("bids", bidsList);
         model.addAttribute("msg", "Successfully placed bid of "+bid+" on item..");
         model.addAttribute("class", "text-success");
