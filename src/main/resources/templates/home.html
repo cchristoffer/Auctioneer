@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Auctioneer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/42b0f28d87.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Document</title>
+</head>
+<body>
+<nav class="navbar nav-white d-flex align-items-center justify-content-around my__line sticky-top">
+    <div class="title-container d-flex align-items-center flex-row">
+    <a class="my__nav__link font-lg my__logo" href="/auctioneer/0"><span class="fas fa-lg fa-gavel"></span> Auctioneer</a>
+    <form class="form-inline my-2 my-lg-0" method="post" action="/auctioneer/search/0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search">
+    </form>
+    </div>
+
+    <div class="nav-content-container d-flex flex-row align-items-center">
+                <a class="my__nav__link mr-5 text-light" href="/auctioneer/mybids">My Bids</a>
+                <a class="my__nav__link mr-5 text-light" href="/auctioneer/myauctions">My Auctions</a>
+                <a class="my__nav__link text-light" href="/auctioneer/create">Create Auction</a>
+        <form id="logoutForm ml-5" method="POST" th:action="@{/logout}">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <input type="submit" value="Logout" class="btn w-200 btn--logout">
+        </form>
+    </div>
+</nav>
+
+<div class="myWrapper">
+    <div class="section-container">
+        <div class="categ-container">
+            <a class="my__nav__link link--category mt-3" href="/auctioneer/vehicles/0"><span class="fas fa-car"></span> Vehicles</a>
+            <a class="my__nav__link link--category" href="/auctioneer/music/0"><span class="fas fa-guitar"></span> Music instruments</a>
+            <a class="my__nav__link link--category" href="/auctioneer/games/0"><span class="fas fa-gamepad"></span> Games & Consoles</a>
+            <a class="my__nav__link link--category" href="/auctioneer/electronics/0"><span class="fas fa-plug"></span> Electronics</a>
+            <a class="my__nav__link link--category" href="/auctioneer/animals/0"><span class="fas fa-dog"></span> Animals</a>
+            <a class="my__nav__link link--category mb-3" href="/auctioneer/clothes/0"><span class="fas fa-tshirt"></span> Clothes & Accessories</a>
+        </div>
+
+        <div class="items-container">
+            <div class="title-container-home">
+                <h2 th:text="${title}"></h2>
+            </div>
+            <div class="auction-container mt-5">
+                <th:block th:each="auction : ${auctions}">
+                    <div class="card m-1 mb-5" style="width: 20%;">
+                        <div class="img-container">
+                            <img class="card-img-top img-auto" th:src="${auction.getItem().getImg()}" th:alt="${auction.getItem().getName()}">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${auction.getItem().getName()}"></h5>
+                            <p class="card-text" th:text="${auction.getItem().getCategory().getDescription()}"></p>
+                            <span th:if="${auction.getHighestBid() == null}">
+                                <p>Starting price: <span th:text="${auction.getStartingPrice()}"></span>$</p>
+                            </span>
+                            <span th:if="${auction.getHighestBid() != null}">
+                                <p>Highest bid: <span th:text="${auction.getHighestBid().getBidPrice()}"></span></p>
+                            </span>
+                            <p class="card-text">Ends at:<br><span th:text="${auction.getTimeRemaining()}"></span></p>
+                            <a th:href="@{/auctioneer/item/{id}(id=${auction.getAuctionId()})}" class="btn">More</a>
+                        </div>
+                    </div>
+                </th:block>
+
+                <div class="row block align-item-center justify-content-center w-100 text-center">
+                    <p>Page <span th:text="${displayableCurrentPageNumber}+' of '+${totalPages}"></span></p>
+                </div>
+                <div class="row block align-item-center justify-content-center w-100 text-center">
+                    <span th:if="${hasPrevious}">
+                        <a th:href="@{/auctioneer/{pageno}(pageno=${previousPageNumber})}">
+                            <i class="fa fa-arrow-circle-left"></i>
+                         Previous</a>
+                    </span>
+                    <span th:if="${hasNext}">
+                        <a th:href="@{/auctioneer/{pageno}(pageno=${nextPageNumber})}">Next
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </a>
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

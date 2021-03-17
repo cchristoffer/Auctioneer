@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Auctioneer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/42b0f28d87.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Document</title>
+</head>
+<body>
+<nav class="navbar nav-white d-flex align-items-center justify-content-around my__line sticky-top">
+    <div class="title-container d-flex align-items-center flex-row">
+        <a class="my__nav__link font-lg my__logo" href="/auctioneer/0"><span class="fas fa-lg fa-gavel"></span> Auctioneer</a>
+        <form class="form-inline my-2 my-lg-0" method="post" action="/auctioneer/search/0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search">
+        </form>
+    </div>
+
+    <div class="nav-content-container d-flex flex-row align-items-center">
+        <a class="my__nav__link mr-5 text-light" href="/auctioneer/mybids">My Bids</a>
+        <a class="my__nav__link mr-5 text-light" href="/auctioneer/myauctions">My Auctions</a>
+        <a class="my__nav__link text-light" href="/auctioneer/create">Create Auction</a>
+        <form id="logoutForm ml-5" method="POST" th:action="@{/logout}">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <input type="submit" value="Logout" class="btn w-200 btn--logout">
+        </form>
+    </div>
+</nav>
+
+<div class="myWrapper">
+    <div class="row main-content bg-success text-center">
+        <div class="col-md-4 text-center company__info">
+            <span class="company__logo"><h2><span class="fas fa-3x fa-gavel"></span></h2></span>
+            <h4 class="company_title">Auctioneer</h4>
+        </div>
+        <div class="col-md-8 col-xs-12 col-sm-12 login_form ">
+            <div class="container-fluid">
+                <div class="row block mt-3">
+                    <h2>Create Auction</h2>
+                </div>
+                <div class="row block">
+                    <form action="/auctioneer/create" method="post" class="form-group">
+                        <div class="row">
+                            <input type="text" name="name" id="name" class="form__input" placeholder="Name of item">
+                        </div>
+                        <div class="row">
+                            <input type="text" name="img" id="img" class="form__input" placeholder="Image URL">
+                        </div>
+                        <div class="row">
+                            <textarea class="form__input" name="description" rows="5" placeholder="Description"></textarea>
+                        </div>
+
+                        <div class="row flex-nowrap justify-content-around">
+                            <div class="form-group">
+                            <label for="endsAt">Expires in..</label>
+                                <select class="form-control p-0" id="endsAt" name="endsAt">
+                                    <option value="short">Short <span class="text-muted"> - 1 day</span></option>
+                                    <option value="medium">Medium <span class="text-muted"> - 3 days</span></option>
+                                    <option value="long">Long <span class="text-muted"> - 7 days</span></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select class="form-control p-0" id="category" name="category">
+                                    <option value=1>Vehicles</option>
+                                    <option value=2>Music Instruments</option>
+                                    <option value=3>Games & Consoles</option>
+                                    <option value=4>Electronics</option>
+                                    <option value=5>Animals</option>
+                                    <option value=6>Clothes & Accessories</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                            <label for="startingPrice">Starting price</label>
+                            <input type="number" name="startingPrice" id="startingPrice" class="form-control p-0" placeholder="Starting Price">
+                            </div>
+                        </div>
+
+
+                        <div class="row block">
+                            <input type="submit" value="Submit" class="btn">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

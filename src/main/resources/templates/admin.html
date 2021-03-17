@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Auctioneer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/42b0f28d87.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Document</title>
+</head>
+<body>
+<nav class="navbar nav-white d-flex align-items-center justify-content-around my__line sticky-top">
+    <div class="title-container d-flex align-items-center flex-row">
+        <a class="my__nav__link font-lg my__logo" href="/auctioneer/0"><span class="fas fa-lg fa-gavel"></span> Auctioneer</a>
+        <form class="form-inline my-2 my-lg-0" method="post" action="/auctioneer/search/0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search">
+        </form>
+    </div>
+
+    <div class="nav-content-container d-flex flex-row align-items-center">
+        <a class="my__nav__link mr-5 text-light" href="/admin/auctions/0">Auctions</a>
+        <a class="my__nav__link mr-5 text-light" href="/admin/users/0">Users</a>
+        <form id="logoutForm ml-5" method="POST" th:action="@{/logout}">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <input type="submit" value="Logout" class="btn w-200 btn--logout">
+        </form>
+    </div>
+</nav>
+
+<div class="myWrapper">
+    <div class="items-container justify-content-center">
+        <div class="title-container-home mt-5">
+            <h2 th:text="${title}"></h2>
+        </div>
+    <th:block th:each="auction : ${auctions}">
+
+        <div class="modal mt-5" th:id="'modal'+${auction.getAuctionId()}" tabindex="-1"  role="dialog" th:aria-labelledby="${auction.getAuctionId()}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-col-main">
+                        <h5 class="modal-title">Manage Auction <span class="fas fa-lg fa-gavel"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-3">
+                        <form class="p-0" action="/admin/auctions/update" method="post">
+                            <div class="form-group">
+                                <label class="font-weight-bold" for="itemName">Item name</label>
+                                <input type="text" class="form-control" name="name" id="itemName" th:value="${auction.getItem().getName()}">
+                            </div>
+                            <div class="form-group mt-2">
+                                <label class="font-weight-bold" for="url">Image Url</label>
+                                <input type="text" class="form-control" name="img" id="url" th:value="${auction.getItem().getImg()}">
+                            </div>
+                            <div class="form-group mt-2">
+                                <label class="font-weight-bold" for="desc">Description</label>
+                                <textarea type="text" class="form-control" rows="4" name="description" id="desc" th:text="${auction.getItem().getDescription()}"></textarea>
+                            </div>
+                            <div class="form-group mt-2">
+                                <label class="font-weight-bold" for="category">Category</label>
+                                <select class="form-control p-0" id="category" name="category">
+                                    <option value=1>Vehicles</option>
+                                    <option value=2>Music Instruments</option>
+                                    <option value=3>Games & Consoles</option>
+                                    <option value=4>Electronics</option>
+                                    <option value=5>Animals</option>
+                                    <option value=6>Clothes & Accessories</option>
+                                </select>
+                            </div>
+                            <div class="form-group mt-2">
+                                <label class="font-weight-bold" for="exp">Expires</label>
+                                <input type="text" class="form-control" id="exp" th:value="${auction.endsAt}" readonly>
+                            </div>
+                            <div class="form-group mt-2">
+                                <label class="font-weight-bold" for="price">Starting Price</label>
+                                <input type="text" class="form-control" id="price" th:value="${auction.getStartingPrice()}+' $'" readonly>
+                            </div>
+
+                    </div>
+                    <div class="modal-footer d-flex flex-direction-row align-items-center justify-content-around">
+                        <input type="hidden" th:value="${auction.auctionId}" name="id">
+                        <button type="submit" class="btn w-30">Save changes</button>
+                        </form>
+                        <form action="/admin/auctions/delete" method="post" class="w-50">
+                            <input type="hidden" th:value="${auction.auctionId}" name="id">
+                            <button type="submit" class="btn ml-3">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </th:block>
+
+        <th:block th:each="user : ${users}">
+
+            <div class="modal mt-5" th:id="'modal'+${user.userId}" tabindex="-1"  role="dialog" th:aria-labelledby="${user.userId}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-col-main">
+                            <h5 class="modal-title">Manage User <span class="fas fa-lg fa-gavel"></span></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-3">
+                            <form class="p-0" action="/admin/users/update" method="post">
+                                <div class="form-group">
+                                    <label class="font-weight-bold" for="name">Name</label>
+                                    <input type="text" class="form-control" name="name" id="name" th:value="${user.name}">
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="font-weight-bold" for="username">Email</label>
+                                    <input type="text" class="form-control" name="username" id="username" th:value="${user.username}">
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="font-weight-bold" for="address">Address</label>
+                                    <input type="text" class="form-control" name="address" id="address" th:value="${user.address}">
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="font-weight-bold" for="postNr">Post number</label>
+                                    <input type="text" class="form-control" name="postNr" id="postNr" th:value="${user.postNr}">
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="font-weight-bold" for="phoneNr">Phone number</label>
+                                    <input type="text" class="form-control" name="phoneNr" id="phoneNr" th:value="${user.phoneNr}">
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="font-weight-bold" for="enabled">Enabled</label>
+                                    <select class="form-control p-0" id="enabled" name="enabled">
+                                        <option value=1>Enabled</option>
+                                        <option value=0>Disabled</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="modal-footer d-flex flex-direction-row align-items-center justify-content-around">
+                            <input type="hidden" th:value="${user.userId}" name="id">
+                            <button type="submit" class="btn w-30">Save changes</button>
+                            </form>
+                            <form action="/admin/users/delete" method="post" class="w-50">
+                                <input type="hidden" th:value="${user.userId}" name="id">
+                                <button type="submit" class="btn ml-3">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </th:block>
+
+    <th:block th:if="${auctions != null}">
+        <table class="table w-90 mt-3">
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Current Bid</th>
+                <th scope="col">Expires</th>
+                <th scope="col">Manage</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="auction : ${auctions}" th:classappend="${auction.getActive()} ? 'none' : 'table-active line-trough'">
+                <td><a th:href="@{/auctioneer/item/{id}(id=${auction.auctionId})}" th:text="${auction.getItem().getName()}"></a></td>
+                <td th:text="${auction.getItem().getCategory().getDescription()}"></td>
+                <td th:text="${auction.getCurrentPrice()}"></td>
+                <td th:text="${auction.endsAt}"></td>
+                <td><a class="btn" type="button" data-toggle="modal" th:data-target="'#modal'+${auction.getAuctionId()}">Manage</a></td>
+
+
+            </tr>
+            </tbody>
+        </table>
+    </th:block>
+
+        <th:block th:if="${users != null}">
+            <table class="table w-90 mt-3">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Post nr</th>
+                    <th scope="col">Phone nr</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Manage</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}" th:classappend="${user.getEnabled()} ? 'none' : 'table-active line-trough'">
+                    <td th:text="${user.name}"> </td>
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.address}"></td>
+                    <td th:text="${user.postNr}"></td>
+                    <td th:text="${user.phoneNr}"></td>
+                    <td th:text="${user.role}"></td>
+                    <td><a class="btn" type="button" data-toggle="modal" th:data-target="'#modal'+${user.userId}">Manage</a></td>
+
+
+                </tr>
+                </tbody>
+            </table>
+        </th:block>
+
+        <div class="row block align-item-center justify-content-center w-100 text-center">
+            <p>Page <span th:text="${displayableCurrentPageNumber}+' of '+${totalPages}"></span></p>
+        </div>
+        <div class="row block align-item-center justify-content-center w-100 text-center">
+                    <span th:if="${hasPrevious}">
+                        <a th:href="@{/admin/auctions/{pageno}(pageno=${previousPageNumber})}">
+                            <i class="fa fa-arrow-circle-left"></i>
+                         Previous</a>
+                    </span>
+            <span th:if="${hasNext}">
+                        <a th:href="@{/admin/auctions/{pageno}(pageno=${nextPageNumber})}">Next
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </a>
+                    </span>
+        </div>
+</div>
+
+</body>
+</html>
