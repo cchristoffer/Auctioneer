@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -153,15 +154,16 @@ public class AuctionController {
     @PostMapping("/bid")
     public String bidItem(@RequestParam Long id, @RequestParam double bid, Principal principal, Model model){
         Auction auction = auctionService.findAuctionById(id);
+        boolean hasBid = false;
+        Double highestBid = auction.getStartingPrice();
+        List<Bid> bidsList = new ArrayList<>();
+        if(auction.getHighestBid()!=null) {
+            highestBid = auction.getHighestBid().getBidPrice();
+            hasBid = true;
+            bidsList = auction.getBids();
+        }
         if(auctionService.findAuctionById(id).getHighestBid() != null){
             if(bid <= auctionService.findAuctionById(id).getHighestBid().getBidPrice()){
-                boolean hasBid = false;
-                Double highestBid = auction.getStartingPrice();
-                if(auction.getHighestBid()!=null){
-                    highestBid = auction.getHighestBid().getBidPrice();
-                    hasBid = true;
-                }
-                List<Bid> bidsList = auction.getBids();
                 model.addAttribute("title", auction.getItem().getName());
                 model.addAttribute("auction", auction);
                 model.addAttribute("highestBid", highestBid);
@@ -183,8 +185,13 @@ public class AuctionController {
         auctionPublisher.addObserver(bidObserver);
         auctionPublisher.publishNewBid(newBid);
 
+        model.addAttribute("highestBid", highestBid);
+        model.addAttribute("numBids", auction.getBids().size());
+        model.addAttribute("hasBid", hasBid);
         model.addAttribute("title", auction.getItem().getName());
         model.addAttribute("auction", auction);
+        Collections.reverse(bidsList);
+        model.addAttribute("bids", bidsList);
         model.addAttribute("msg", "Successfully placed bid of "+bid+" on item..");
         model.addAttribute("class", "text-success");
         return "auctionItem";
